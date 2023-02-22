@@ -50,5 +50,5 @@ const serverStarted = async () => {
 serverStarted();
 
 server.listen(3001, () => {
-	console.log("Yo! Server is running on port 3001!");
+	console.log("Yo! Server is running on port 3001! Yea!");
 });
