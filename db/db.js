@@ -1,6 +1,7 @@
 import Sequelize from "sequelize";
 import PostModel from "./Post.js";
 import UserModel from "./User.js";
+import bcrypt from "bcrypt";
 
 
 let db; 
@@ -27,14 +28,55 @@ const connectToDB = async () => {
 		await db.authenticate();
 		console.log("Connected to DB successfully");
 
-		db.sync();
+		await db.sync(); // sync by creating the tables based off our models if they don't exist already
 	} catch (error) {
 		console.error(error);
 		console.error("PANIC! DB POBLEM!");
 	}
+
+	// Post.belongsTo(User, { foreignKey: "authorID" });
+
 };
 
-connectToDB();
+//#10 seeding the database
+const createFirstUser = async () => {
+	const users = await User.findAll({});
+	if (users.length === 0) {
+		User.create({
+			email: "max",
+			password: bcrypt.hashSync("supersecret", 10),
+		});
+	}
+};
+
+const createSecondUser = async () => {
+	const secondUser = await User.findOne({
+		where: { email: "testymctesterson" },
+	});
+	if (!secondUser) {
+		User.create({
+			email: "testymctesterson",
+			password: bcrypt.hashSync("secret", 10),
+		});
+	}
+};
+
+const serverStarted = async () => { 
+	const user = await User.findOne({ email: "sj@gmail.com" });
+	if (!user) {
+		await User.create({
+			email:"sj@gmail.com",
+			firstName: "Snites",
+			password: bcrypt.hashSync("Okurr", 10),
+		});
+	}
+};
+
+connectToDB().then(() => {
+	createFirstUser();
+	createSecondUser();
+	serverStarted();
+});
 
 export { db, Post, User };
 

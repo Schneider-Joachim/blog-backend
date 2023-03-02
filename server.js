@@ -4,7 +4,7 @@ import { db, Post, User } from "./db/db.js";
 import bcrypt from "bcrypt";
 
 const server = express();
-server.use(cors());
+server.use(cors({ credentials: true, origin: ["http://localhost:3000", "https://evnowsite.com", "https://www.evnowsite.com"] }));
 server.use(express.json());
 
 server.get("/", (req, res) => {
@@ -37,18 +37,18 @@ server.post("/login", async (req, res) => {
 	res.send({ loggedIn: true });
 });
 
-const serverStarted = async () => { 
-	const user = await User.findOne({ email: "sj@gmail.com" });
-	if (!user) {
-		await User.create({
-			email:"sj@gmail.com",
-			firstName: "Snites",
-			password: bcrypt.hashSync("Okurr", 10),
-		});
-	}
-};
-serverStarted();
 
-server.listen(3001, () => {
-	console.log("Yo! Server is running on port 3001! Yea!");
+// bind to the correct port that AWS assigns us
+let port = 3001; 
+if (process.env.PORT) {
+	port = process.env.PORT;
+}
+
+//#9 run express API server in background to listen for incoming requests
+server.listen(port, () => {
+	console.log("Server running.");
 });
+
+// server.listen(3001, () => {
+// 	console.log("Yo! Server is running on port 3001! Yea!");
+// });
